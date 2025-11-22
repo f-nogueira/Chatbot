@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  #  BACKEND (PYTHON)
+  backend:
+    build: .
+    container_name: floricultura_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app  # Espelhamento: Se alterar o código no VS Code, altera no Docker
+    env_file:
+      - .env    # Pega seu token HF automaticamente
+    restart: always
+
+  # --- FRONTEND (REACT) 
+  frontend:
+    build: ./frontend
+    container_name: floricultura_frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules # Evita conflito entre o node_modules do Windows e do Linux
+    depends_on:
+      - backend # Só inicia depois que o backend existir
+    environment:
+      - CHOKIDAR_USEPOLLING=true # Força o polling também pelo ambiente
+    restart: always
